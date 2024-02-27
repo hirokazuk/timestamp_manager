@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# code: language=bash
+
+function RESTORE_TIMESTAMP()  {
+  for x in "$@"
+  do
+    if [ ! -e "$x" ]; then
+      echo "no file/dir" >&2
+      return 1
+    fi
+
+    local abspath=$(realpath "$x") # $(cd $(dirname "$x") && pwd)/$(basename "$x")
+    x=${abspath}
+
+    FINDED_TIMESTAMP=$(KV_FIND "BACKUP_TIMESTAMP:$x")
+    if [ $? = 0 ]; then
+      touch -d "${FINDED_TIMESTAMP}"  "$x"
+    else
+      echo "バックアップされてない"
+    fi
+  done
+}
+RESTORE_TIMESTAMP $@

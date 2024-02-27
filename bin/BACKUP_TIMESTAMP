@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# code: language=bash
+
+function BACKUP_TIMESTAMP()  {
+  for x in "$@"
+  do
+    if [ ! -e "$x" ]; then
+      echo "$x is not file/dir" >&2
+      return 1
+    fi
+    local abspath=$(realpath "$x")  # $(cd $(dirname "$x") && pwd)/$(basename "$x")
+    x=${abspath}
+
+    BACKUPED_UTIME=$(stat -f "%m" "$x")
+    BACKUPED_DTIME=$(date -r $BACKUPED_UTIME +"%Y-%m-%dT%H:%M:%S")
+
+    KV_ADD "BACKUP_TIMESTAMP:$x" "${BACKUPED_DTIME}"  # >/dev/null
+    echo TIMESTAMP backuped! "$x":${BACKUPED_DTIME}
+  done
+}
+BACKUP_TIMESTAMP $@
